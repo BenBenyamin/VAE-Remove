@@ -66,7 +66,7 @@ class Encoder(nn.Module):
 
         z = self.reparameterize(mean,log_var)
 
-        return z
+        return z , mean, log_var
 
 
 
@@ -108,26 +108,83 @@ class Decoder(nn.Module):
         x = self.layers(x)
 
         return x
+    
+
+class VAE(nn.Module):
+
+    def __init__(self,
+                 input_shape,
+                 latent_size,
+                 feature_sizes = [64,128,256,512]
+                 ):
         
+        super().__init__()
+        
+        self.input_size = input_shape
+        self.latent_size = latent_size
+        self.feature_sizes = feature_sizes
 
-# ----- ENCODER TEST -----
-encoder = Encoder(input_channels=3, latent_size=141)
-x = torch.randn(8, 3, 128, 128)
+        self.encoder = Encoder(
+            input_channels=input_shape[0],
+            latent_size=latent_size,
+            feature_sizes= feature_sizes
+        )
 
-z = encoder(x)
+        self.decoder = Decoder(
+            output_channels=input_shape[0],
+            feature_sizes= feature_sizes[::-1],
+            latent_size=latent_size,
+            input_shape=input_shape
+        )
+    
+    def forward(self,x):
 
-print("Input shape:", x.shape)
-print("Latent z shape:", z.shape)
+        z , mean , log_var = self.encoder(x)
+        z = self.decoder(z)
 
-# ----- DECODER TEST -----
-decoder = Decoder(
-    output_channels=3,         
-    latent_size=141,           
-    input_shape=(3, 128, 128) 
-)
+        return z, mean, log_var
+    
+    def decode(self,z):
 
-recon_x = decoder(z)
+        return self.decoder(z)
 
-# Print shapes
-print("Decoder latent input shape:", z.shape)
-print("Reconstructed output shape:", recon_x.shape)
+# # ----- ENCODER TEST -----
+# encoder = Encoder(input_channels=3, latent_size=141)
+# x = torch.randn(8, 3, 128, 128)
+
+# z  , mean , log_var = encoder(x)
+
+# print("[ENCODER] Input shape:", x.shape)
+# print("[ENCODER] Latent z shape:", z.shape)
+
+# # ----- DECODER TEST -----
+# decoder = Decoder(
+#     output_channels=3,         
+#     latent_size=141,           
+#     input_shape=(3, 128, 128) 
+# )
+
+# recon_x = decoder(z)
+
+# # Print shapes
+# print("[DECODER] Decoder latent input shape:", z.shape)
+# print("[DECODER] Reconstructed output shape:", recon_x.shape)
+
+# # ----- VAE TEST -----
+# vae = VAE(
+#     input_shape=(3, 128, 128),
+#     latent_size=141,
+#     feature_sizes=[64, 128, 256, 512]
+# )
+
+# # Dummy input
+# x = torch.randn(8, 3, 128, 128)
+
+# # Pass through VAE
+# recon_x, mean, log_var = vae(x)
+
+# # Print shapes
+# print("[VAE] Input shape:", x.shape)
+# print("[VAE] Reconstructed output shape:", recon_x.shape)
+# print("[VAE] Mean shape:", mean.shape)
+# print("[VAE] Log variance shape:", log_var.shape)
