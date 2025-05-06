@@ -99,6 +99,7 @@ class Decoder(nn.Module):
         layers.append(nn.Sigmoid())
         self.layers = nn.Sequential(*layers)
 
+
     def forward(self, z):
 
         batch = z.shape[0]
@@ -147,44 +148,3 @@ class VAE(nn.Module):
     def decode(self,z):
 
         return self.decoder(z)
-
-# # ----- ENCODER TEST -----
-# encoder = Encoder(input_channels=3, latent_size=141)
-# x = torch.randn(8, 3, 128, 128)
-
-# z  , mean , log_var = encoder(x)
-
-# print("[ENCODER] Input shape:", x.shape)
-# print("[ENCODER] Latent z shape:", z.shape)
-
-# # ----- DECODER TEST -----
-# decoder = Decoder(
-#     output_channels=3,         
-#     latent_size=141,           
-#     input_shape=(3, 128, 128) 
-# )
-
-# recon_x = decoder(z)
-
-# # Print shapes
-# print("[DECODER] Decoder latent input shape:", z.shape)
-# print("[DECODER] Reconstructed output shape:", recon_x.shape)
-
-# # ----- VAE TEST -----
-# vae = VAE(
-#     input_shape=(3, 128, 128),
-#     latent_size=141,
-#     feature_sizes=[64, 128, 256, 512]
-# )
-
-# # Dummy input
-# x = torch.randn(8, 3, 128, 128)
-
-# # Pass through VAE
-# recon_x, mean, log_var = vae(x)
-
-# # Print shapes
-# print("[VAE] Input shape:", x.shape)
-# print("[VAE] Reconstructed output shape:", recon_x.shape)
-# print("[VAE] Mean shape:", mean.shape)
-# print("[VAE] Log variance shape:", log_var.shape)

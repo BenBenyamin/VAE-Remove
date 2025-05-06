@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 class VAELoss(nn.Module):
     def __init__(self, beta=1.0):
@@ -8,7 +9,7 @@ class VAELoss(nn.Module):
         super().__init__()
         self.beta = beta
 
-    def forward(self, x, recon_x, mean, log_var):
+    def forward(self, x, recon_x, mean, log_var,progress):
         # Reconstruction loss (MSE)
         recon_loss = F.mse_loss(recon_x, x, reduction='sum') / x.size(0)
 
@@ -17,6 +18,6 @@ class VAELoss(nn.Module):
         kl_loss = kl_loss.mean()
 
         # Total loss
-        total_loss = recon_loss + self.beta * kl_loss
+        total_loss = recon_loss + self.beta* kl_loss
 
         return total_loss, recon_loss, kl_loss
