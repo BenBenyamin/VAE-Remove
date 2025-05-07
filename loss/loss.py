@@ -10,8 +10,8 @@ class VAELoss(nn.Module):
         self.beta = beta
 
     def forward(self, x, recon_x, mean, log_var,progress):
-        # Reconstruction loss (MSE)
-        recon_loss = F.mse_loss(recon_x, x, reduction='sum') / x.size(0)
+        # Reconstruction loss
+        recon_loss = F.binary_cross_entropy(recon_x, x, reduction='sum')/ x.size(0)
 
         # KL divergence loss
         kl_loss = -0.5 * torch.sum(1 + log_var - mean.pow(2) - log_var.exp(), dim=1)
